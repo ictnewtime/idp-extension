@@ -35,6 +35,7 @@ Edit `config/auth.php` as follow:
         // ...
         IdpClientServiceProvider::class, // <- add this
     ],
+]
 ```
 
 Edit `bootstrap/providers.php` as follow:
@@ -47,4 +48,13 @@ return [
     App\Providers\FortifyServiceProvider::class,
     NewTimeGroup\IdpClient\Providers\IdpClientServiceProvider::class, // <- add this
 ];
+```
+
+Edit `routes/web.php` or `routes/api.php` as follow:
+
+```php
+use NewTimeGroup\IdpClient\Http\Middleware\IdpAuthMiddleware;
+...
+Route::middleware([IdpAuthMiddleware::class])->group(function () {
+});
 ```
