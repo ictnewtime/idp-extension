@@ -4,202 +4,121 @@ This is Laravel package to use with laravel-jwt-idp (Github: https://github.com/
 
 ## How to integrate package in your project
 
-### Step 1 - Install by Composer
+### Step 1 - Install Vendor
 
-```bash
-   composer require zanichelli/idp-extensions
-```
+1. Modifica il composer.json
 
-**`Note:`you should use tag instead of branch-name (e.g. _"zanichelli/idp-extensions:V1.0.0"_ or _"zanichelli/idp-extensions:dev-{branch-name}"_ )**
-
-### Step 2 - .env file
-
-Add this lines at bottom of your .env file:
-
-```
-  IDP_BASE_URL=https://idp.zanichelli.it
-  IDP_COOKIE_NAME=token
-```
-
-If you need to use your own login form (instead of the IDP one), please add this line too:
-
-```
-  IDP_LOGIN_URL=https://idp.zanichelli.it/v4/login
-```
-
-### Step 3 - auth.php editing
-
-Edit `config/auth.php` as follow:
-
-- In `'defaults'` array change value of `'guard'` from `'web'` to `'z-session'`
-
-### Step 4 - publish migrations
-
-There are 2 migration from this package, Grants table and Sessions Table.
-
-```bash
-   php artisan vendor:publish
-```
-
-and select the "zanichelli/idp-extension" provider
-
-### Step 4.A - publish migrations (BREAKING CHANGES) after v3.0.**\***
-
-There are 3 migrations from this package:
-
-- Grants table
-- Sessions Table
-- Grants table key changes (Change role_id and department_id to **role_name** and **department_name**).
-
-```bash
-   php artisan vendor:publish
-```
-
-Using the command below will only apply the changes about role_id and department_id
-
-```bash
-   php artisan vendor:publish --tag=grants-by-name-instead-of-id
-```
-
-Use
-
-```bash
-   php artisan vendor:publish --tag=grants-by-name-instead-of-id --force
-```
-
-if you need to overwrite grants table changes migration.
-
-### Step 5 - create route middleware and protect your routes
-
-#### For Laravel up to version 10:
-
-In Kernel.php file add "idp" in your routeMiddleware
-
-```php
-'idp' => \Zanichelli\IdpExtension\Http\Middleware\IdpMiddleware::class,
-```
-
-#### For Laravel from version 11:
-
-Kernel.php file is no more. Register your middleware in 'bootstrap/app.php'
-
-```php
-$middleware->alias([
-  'idp' => \Zanichelli\IdpExtension\Http\Middleware\IdpMiddleware::class
-]);
-```
-
-<hr />
-
-The default behaviour also retrieves the user's permissions (`with_permissions`) and remove token from query params (`without_token_url`)
-You can specify different configuration like this:
-Avoid to remove token from url
-
-```php
-  Route::group(['middleware'=>'idp:with_permissions,with_token_url'],function(){
-    Route::get('/', function(){
-      return view('home');
-    });
-  });
-```
-
-Avoid to retrieve permission
-
-```php
-  Route::group(['middleware'=>'idp:without_permissions'],function(){
-    Route::get('/', function(){
-      return view('home');
-    });
-  });
-```
-
-Avoid to remove token from url and retrieve permission
-
-```php
-  Route::group(['middleware'=>'idp:without_permissions,with_token_url'],function(){
-    Route::get('/', function(){
-      return view('home');
-    });
-  });
-```
-
-Add to your route file (tipically `web.php`) the new middleware `idp`; code smells like this:
-
-```php
-  Route::group(['middleware'=>'idp'],function(){
-    Route::get('/', function(){
-      return view('home');
-    });
-  });
-```
-
-Alternatively, two middlewares read the cookie and, if found, retrieves the user's data and adds it to the request
-
-`IdpApiMiddleware` retrieves user's data from v1 user api call
-
-```php
-'idp' => \Zanichelli\IdpExtension\Http\Middleware\IdpApiMiddleware::class,
-```
-
-`IdpApiJWKSMiddleware` retrieves user's data from jwt token
-
-```php
-'idp' => \Zanichelli\IdpExtension\Http\Middleware\IdpApiJWKSMiddleware::class,
-```
-
-### Extends IDP middleware
-
-In order to edit retrive permissions or add extra parameter to user object you can extend default class IDP Middleware.
-
-Class must implement following methods:
-
-- `retrievePermissions`: this method take userId and roles array as input, here role-based permissions must be retrieved to output an array of strings with permissions;
-
-- `addExtraParametersToUser`: this method allow you to add extra parameters to the user object given as input.
-
-After class creation, add in `kernel.php` file the new middleware class in `'$routeMiddleware'` array:
-
-```php
-  'idp' => \App\Http\Middleware\IdpMiddleware::class,
-```
-
-## Logout idp
-
-Create a logout route inside `web.php` file using a **_logout_** method inside the controller.
-Implement the code as follow:
-
-```php
-  Route::group(['middleware'=>'idp'],function(){
-    Route::get('logout',  'LoginController@logout');
-  });
-```
-
-Then define **`logout`**:
-
-```php
-use use Illuminate\Support\Facades\Auth;
-
-class LoginController extends Controller
+```json
 {
-  ...
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "laravel/vue-starter-kit",
+    "type": "project",
+    // ... (altre stringhe)
 
-  public function logout()
-  {
-    return Auth::logout();
-  }
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/utente/nome-pacchetto"
+        },
+        {
+            "type": "vcs",
+            "url": "https://gitea.newtimegroup.it/utente/nome-pacchetto"
+        }
+    ],
+
+    "require": {
+        "php": "^8.2",
+        "inertiajs/inertia-laravel": "^2.0",
+        "laravel/fortify": "^1.30",
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10.1",
+        "laravel/wayfinder": "^0.1.9",
+        "utente/nome-pacchetto": "dev-main"
+    }
+    // ... resto del file
 }
 ```
 
-# Basics
+2. Crea il file auth.json
 
-With this integration you could use some Laravel's feature that allows to handle users and their authentication.
-`Auth` is authtentication class that Laravel ships for this purpose and allow access to following methods:
+```json
+{
+    "http-basic": {
+        "gitea.newtimegroup.it": {
+            "username": "tuo_username",
+            "password": "il_tuo_token_di_accesso_personale"
+        }
+    },
+    "github-oauth": {
+        "github.com": "ghp_il_tuo_token_github_oauth_molto_segreto"
+    }
+}
+```
 
-- `Auth::check()`: returns `true` if a user is authenticated, `false` otherwise
-- `Auth::guest()`: returns `true` if a user is guest, `false` otherwise
-- `Auth::user()`: returns a `ZUser` class instance, `null` otherwise
-- `Auth::id()`: returns `userId` if authtenticated, `null` otherwise
-- `Auth::hasUser()`: returns `true` if there's a ZUser in our current session, `false` otherwise
-- `Auth::setUser($ZUser)`: sets a `Zuser` in session
-- `Auth::attempt($credentials, $remember)`: try to login with IDP without using the login form, if success returns `true`, otherwise `false`
-- `Auth::logout()`: logout a user, return `redirect`
+Riassunto della struttura delle cartelle
+
+```txt
+mio-progetto-laravel/
+├── app/
+├── config/
+├── ...
+├── auth.json         <-- Il nuovo file (Nascosto al Git)
+├── composer.json     <-- Modificato con "repositories"
+└── .gitignore        <-- Modificato aggiungendo "auth.json"
+```
+
+4. Installazione
+
+```sh
+composer update utente/nome-pacchetto
+# (Oppure composer install se stai partendo da zero).
+```
+
+### Step 2 - Configure .env file
+
+Aggiungere queste variabili d' ambiente enll' .env
+
+```
+# IDP
+IDP_CLIENT_ID=<ID sull' idp del provider>
+IDP_URL="http://localhost:8001"
+IDP_URL_LOGIN="http://localhost:8001/loginForm"
+IDP_CLIENT_SECRET=<32-alfanumeric-string>
+```
+
+### Step 3 - Add laravel configuration
+
+Edit `config/auth.php` as follow:
+
+```php
+// ...
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => env('AUTH_MODEL', App\Models\User::class),
+        // ...
+        IdpClientServiceProvider::class, // <- add this
+    ],
+]
+```
+
+Edit `bootstrap/providers.php` as follow:
+
+```php
+<?php
+
+return [
+    App\Providers\AppServiceProvider::class,
+    App\Providers\FortifyServiceProvider::class,
+    NewTimeGroup\IdpClient\Providers\IdpClientServiceProvider::class, // <- add this
+];
+```
+
+Edit `routes/web.php` or `routes/api.php` as follow:
+
+```php
+use NewTimeGroup\IdpClient\Http\Middleware\IdpAuthMiddleware;
+...
+Route::middleware([IdpAuthMiddleware::class])->group(function () {
+});
+```
