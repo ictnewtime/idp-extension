@@ -4,10 +4,74 @@ This is Laravel package to use with laravel-jwt-idp (Github: https://github.com/
 
 ## How to integrate package in your project
 
-### Step 1 - Install by Composer
+### Step 1 - Install Vendor
 
-```bash
-composer require ictnewtime/idp-extensions
+1. Modifica il composer.json
+
+```json
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "laravel/vue-starter-kit",
+    "type": "project",
+    // ... (altre stringhe)
+
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/utente/nome-pacchetto"
+        },
+        {
+            "type": "vcs",
+            "url": "https://gitea.newtimegroup.it/utente/nome-pacchetto"
+        }
+    ],
+
+    "require": {
+        "php": "^8.2",
+        "inertiajs/inertia-laravel": "^2.0",
+        "laravel/fortify": "^1.30",
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10.1",
+        "laravel/wayfinder": "^0.1.9",
+        "utente/nome-pacchetto": "dev-main"
+    }
+    // ... resto del file
+}
+```
+
+2. Crea il file auth.json
+
+```json
+{
+    "http-basic": {
+        "gitea.newtimegroup.it": {
+            "username": "tuo_username",
+            "password": "il_tuo_token_di_accesso_personale"
+        }
+    },
+    "github-oauth": {
+        "github.com": "ghp_il_tuo_token_github_oauth_molto_segreto"
+    }
+}
+```
+
+Riassunto della struttura delle cartelle
+
+```txt
+mio-progetto-laravel/
+├── app/
+├── config/
+├── ...
+├── auth.json         <-- Il nuovo file (Nascosto al Git)
+├── composer.json     <-- Modificato con "repositories"
+└── .gitignore        <-- Modificato aggiungendo "auth.json"
+```
+
+4. Installazione
+
+```sh
+composer update utente/nome-pacchetto
+# (Oppure composer install se stai partendo da zero).
 ```
 
 ### Step 2 - Configure .env file
