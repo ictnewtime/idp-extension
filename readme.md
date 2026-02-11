@@ -18,22 +18,13 @@ This is Laravel package to use with laravel-jwt-idp (Github: https://github.com/
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/utente/nome-pacchetto"
-        },
-        {
-            "type": "vcs",
-            "url": "https://gitea.newtimegroup.it/utente/nome-pacchetto"
+            "url": "https://github.com/ictnewtime/idp-extension.git"
         }
     ],
 
     "require": {
-        "php": "^8.2",
-        "inertiajs/inertia-laravel": "^2.0",
-        "laravel/fortify": "^1.30",
-        "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9",
-        "utente/nome-pacchetto": "dev-main"
+        "ictnewtime/idp-extension": "dev-master",
+        "php": "^8.2"
     }
     // ... resto del file
 }
@@ -49,6 +40,7 @@ This is Laravel package to use with laravel-jwt-idp (Github: https://github.com/
             "password": "il_tuo_token_di_accesso_personale"
         }
     },
+    // oppure
     "github-oauth": {
         "github.com": "ghp_il_tuo_token_github_oauth_molto_segreto"
     }
