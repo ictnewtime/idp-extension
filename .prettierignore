@@ -1,0 +1,30 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Build output
+public/build/
+public/hot
+public/storage
+
+# Laravel generated
+bootstrap/cache/
+storage/
+
+# IDE & editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache & logs
+*.log
+.phpunit.cache/
+
+# Compiled assets
+*.min.js
+*.min.css
+
+# Lock files
+package-lock.json
+composer.lock
