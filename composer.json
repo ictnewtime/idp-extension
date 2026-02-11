@@ -1,5 +1,5 @@
 {
-    "name": "newtimegroup/idp-extension",
+    "name": "ictnewtime/idp-extension",
     "description": "Client SDK per integrazione IDP centralizzato",
     "type": "library",
     "license": "MIT",
