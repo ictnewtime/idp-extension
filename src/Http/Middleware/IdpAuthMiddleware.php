@@ -21,26 +21,38 @@ class IdpAuthMiddleware
     public function handle(Request $request, Closure $next)
     {
         // Get the token from cookies (Laravel's cookie helper or directly from $_COOKIE)
-        $cookie_key = "idp_token_" . $this->idpService->getClientId();
-        $token = $request->cookie($cookie_key) ?? ($_COOKIE[$cookie_key] ?? null);
+        $provider_id = $this->idpService->getClientId();
+        $cookie_key = "idp_token_" . $provider_id;
 
-        // If the token is missing, redirect to IDP
-        if (!$token) {
+        $token_url = $request->query("token");
+        $token_cookie = $request->cookie($cookie_key) ?? ($_COOKIE[$cookie_key] ?? null);
+
+        if (!$token_url && !$token_cookie) {
             $currentUrl = $request->fullUrl();
+            Log::warning("REDIRECT: Token not forund. Ssend user to IDP. Return URL: " . $currentUrl);
             return redirect()->away($this->idpService->getLoginUrl($currentUrl));
         }
 
-        try {
-            // Validate the token by checking its signature and expiration
-            $claims = $this->idpService->validateToken($token);
+        $token_to_validate = null;
+        if ($token_url) {
+            $isLocal = app()->environment("local") || $request->getHost() === "localhost";
 
-            // Opzionale: pulire l'URL dal token per estetica
-            // if ($request->has('token')) {
-            //     return redirect($request->fullUrlWithoutQuery('token'));
-            // }
+            cookie()->queue($cookie_key, $token_url, 60 * 24, "/", null, !$isLocal, true);
+
+            // use url token for the validation
+            $token_to_validate = $token_url;
+
+            // Clear torken from the url
+            return redirect($request->fullUrlWithoutQuery("token"));
+        } else {
+            $token_to_validate = $token_cookie;
+        }
+
+        try {
+            $claims = $this->idpService->validateToken($token_to_validate);
             return $next($request);
         } catch (TokenExpiredException $e) {
-            Log::critical("Security Alert: Token expired. ");
+            Log::critical("Security Alert: Token expired.");
             // Remove the expired token cookie
             $cookie_key = "idp_token_" . $this->idpService->getClientId();
             setcookie($cookie_key, "", time() - 365 * 24 * 60 * 60, "/");
