@@ -1,4 +1,4 @@
-# Zanichelli IDP Laravel Extension packages
+# Newtime IDP-Extension Laravel Vendor
 
 This is Laravel package to use with laravel-jwt-idp (Github: https://github.com/ZanichelliEditore/laravel-jwt-idp).
 
@@ -62,7 +62,7 @@ mio-progetto-laravel/
 4. Installazione
 
 ```sh
-composer update utente/nome-pacchetto
+composer update ictnewtime/idp-extension
 # (Oppure composer install se stai partendo da zero).
 ```
 
